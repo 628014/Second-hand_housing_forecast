@@ -1,12 +1,10 @@
-import csv
 from collections import Counter
-from pyecharts.charts import Funnel, Bar
-import pandas as pd
-from pyecharts.globals import ThemeType
-from pyecharts.charts import Map
-import os
 
-from pyecharts.render import snapshot, make_snapshot
+import pandas as pd
+import seaborn as sns
+from pyecharts.charts import Funnel, Bar, HeatMap
+from pyecharts.charts import Map
+from pyecharts.globals import ThemeType
 
 df = pd.read_csv('../二手房数据/data_all.csv', encoding='utf-8')
 # 装修情况 单价（元/平方米）
@@ -18,39 +16,49 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
 theme = ThemeType.ESSOS
 """
-探究装修情况和单价的关系 ：南丁格尔
+探究装修情况数目和房屋：南丁格尔
 """
 decorating_class = []
-decoration = df.groupby(by=["装修情况"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
+decoration = df.groupby(by=["装修情况"])["单价（元/平方米）"].sum().sort_values(ascending=False).to_dict()
 decorating_class = [[k, v] for k, v in decoration.items()]
-pie1 = Pie({"theme": theme}).add("装修情况和总价的关系",  # 添加提示框标签
+pie1 = Pie({"theme": theme}).add("装修情况平均值",  # 添加提示框标签
                                  decorating_class,  # 输入数据
                                  radius=["20%", "70%"],  # 设置内半径和外半径
                                  center=["50%", "50%"],  # 设置圆心位置
                                  rosetype="radius")  # 玫瑰图模式，通过半径区分数值大小，角度大小表示占比
-pie1.set_global_opts(title_opts=opts.TitleOpts(title="装修和单价的关系",  # 设置图标题
+pie1.set_global_opts(title_opts=opts.TitleOpts(title="装修情况和单价的关系",  # 设置图标题
                                                pos_right='50%'),  # 图标题的位置
                      legend_opts=opts.LegendOpts(  # 设置图例|
                          orient='vertical',  # 垂直放置图例
                          pos_right="90%",  # 设置图例位置
                          pos_top="10%"))
 
-pie1.set_series_opts(label_opts=opts.LabelOpts(formatter="{b} : {d}%"))  # 设置标签文字形式为（国家：占比（%））
-pie1.render("装修&单价.html")
+pie1.set_series_opts(label_opts=opts.LabelOpts(formatter="{b} : {d}"))  # 设置标签文字形式为（国家：占比（%））
+pie1.render("./hjy_pic/装修类别数目和房屋：南丁格尔.html")
 
+decorationMed = df.groupby(by=["装修情况"])["单价（元/平方米）"].median().sort_values(ascending=False)
+decoration_bar = (
+    Bar({"theme": theme})
+        .add_xaxis(decorationMed.index.to_list())
+        .add_yaxis("", decorationMed.to_list())
+        .set_global_opts(
+        title_opts={"text": "装修情况与单价的关系", "subtext": ""}
+    )
+)
+decoration_bar.render("./hjy_pic/装修情况与单价：柱状图.html")
 """
 探究所在楼层和单价的关系 ： 饼图
 """
 df["所在楼层"] = df["所在楼层"].map(lambda x: x[0:3])
 decorating_class = []
-decoration = df.groupby(by=["所在楼层"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
+decoration = df.groupby(by=["所在楼层"])["单价（元/平方米）"].sum().sort_values(ascending=False).to_dict()
 decorating_class = [[k, v] for k, v in decoration.items()]
-pie1 = Pie({"theme": theme}).add("所在楼层和单价的关系",  # 添加提示框标签
+pie1 = Pie({"theme": theme}).add("所在楼层和数量的关系",  # 添加提示框标签
                                  decorating_class,  # 输入数据
                                  radius=["0%", "70%"],  # 设置内半径和外半径
                                  center=["50%", "50%"],  # 设置圆心位置
                                  rosetype="radius")  # 玫瑰图模式，通过半径区分数值大小，角度大小表示占比
-pie1.set_global_opts(title_opts=opts.TitleOpts(title="装修和单价的关系",  # 设置图标题
+pie1.set_global_opts(title_opts=opts.TitleOpts(title="所在楼层和数量的关系",  # 设置图标题
                                                pos_right='50%'),  # 图标题的位置
                      legend_opts=opts.LegendOpts(  # 设置图例|
                          orient='vertical',  # 垂直放置图例
@@ -58,27 +66,75 @@ pie1.set_global_opts(title_opts=opts.TitleOpts(title="装修和单价的关系",
                          pos_top="10%"))
 
 pie1.set_series_opts(label_opts=opts.LabelOpts(formatter="{b} : {d}%"))  # 设置标签文字形式为（国家：占比（%））
-pie1.render("楼层&单价.html")
+pie1.render("./hjy_pic/所在楼层&数量.html")
+
+floor = df.groupby(by=["所在楼层"])["单价（元/平方米）"].mean().sort_values(ascending=False)
+pie1 = (
+    Bar({"theme": theme})
+        .add_xaxis(floor.index.to_list())
+        .add_yaxis("", floor.to_list())
+        .set_global_opts(
+        title_opts={"text": "所在楼层与单价的关系", "subtext": ""}
+    ))
+pie1.set_global_opts(
+    title_opts=opts.TitleOpts(title="所在楼层和单价的关系",  # 设置图标题
+                              pos_right='50%'),  # 图标题的位置
+    legend_opts=opts.LegendOpts(  # 设置图例|
+        orient='vertical',  # 垂直放置图例
+        pos_right="90%",  # 设置图例位置
+        pos_top="10%"))
+
+pie1.set_series_opts(label_opts=opts.LabelOpts(formatter="{b} : {c}"))  # 设置标签文字形式为（国家：占比（%））
+pie1.render("./hjy_pic/所在楼层&单价：柱状图.html")
 
 """
 探究电梯和总价的关系
 """
-elevator_count = df.groupby(by=["配备电梯"])["单价（元/平方米）"].median().sort_values(ascending=False)
-count = Counter(df["配备电梯"])
-pie_x = ["有", "无"]
-pie_y = elevator_count.tolist()
-pie = (
-    Pie({"theme": theme})
-        .add("", [list(z) for z in zip(pie_x, pie_y)])
-        .set_global_opts(title_opts=opts.TitleOpts(title="是否配备电梯和单价的关系"))
-        .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c} ({d}%)"))
+
+
+# elevator_equip = df.groupby(by=["配备电梯"])
+
+
+def floorChange(x):
+    if x == "高楼层":
+        return "高楼层"
+    else:
+        return "中低楼层"
+
+
+df["楼层"] = df["所在楼层"].map(floorChange)
+elevator_equip = df.groupby(by=["楼层"])["配备电梯"].sum()
+highDic = Counter(elevator_equip["中低楼层"])
+lowDic = Counter(elevator_equip["高楼层"])
+x_axis = ["中低楼层", "高楼层"]
+y_axis = ["无", "有"]
+data = [[0, 0, lowDic["无"]], [0, 1, lowDic["有"]], [1, 0, highDic["无"]], [1, 1, highDic["有"]]]
+print(data)
+heatmap = (
+    HeatMap()
+        .add_xaxis(x_axis)
+        .add_yaxis("有无电梯", y_axis, data)
+        .set_global_opts(
+        title_opts=opts.TitleOpts(title="不同楼层与电梯关系热力图"),
+        visualmap_opts=opts.VisualMapOpts(max_=highDic["有"], min_=lowDic["无"])
+    )
 )
-pie.render("电梯&单价.html")
+heatmap.render("./hjy_pic/电梯&单价.html")
 
 """
 房屋用途 & 单价
 """
-home_category = df.groupby(by=["房屋用途"])["单价（元/平方米）"].median().sort_values(ascending=False)
+
+
+def use(x):
+    if x == "普通住":
+        return "普通住宅"
+    else:
+        return x
+
+
+df["房屋用途"] = df["房屋用途"].map(use)
+home_category = df.groupby(by=["房屋用途"])["单价（元/平方米）"].mean()
 home_categoryX = home_category.index.to_list()
 home_categoryY = home_category.to_list()
 
@@ -90,15 +146,15 @@ c_d1 = (
         title_opts={"text": "房屋用途与单价的关系", "subtext": ""}
     )
 )
-c_d1.render("住宅类别&单价.html")
+c_d1.render("./hjy_pic/房屋用途&单价.html")
 """
 建筑结构 & 单价
 """
-structure = df.groupby(by=["建筑结构"])["单价（元/平方米）"].median().sort_values(ascending=False)
+structure = df.groupby(by=["建筑结构"])["单价（元/平方米）"].mean().sort_values(ascending=False)
 structureX = structure.index.to_list()
 structureY = structure.to_list()
 data = [[structureX[i], structureY[i]] for i in range(len(structureX))]
-
+print(structure)
 funnel = (
     Funnel({"theme": theme}).add(
         series_name="",
@@ -109,7 +165,7 @@ funnel = (
         itemstyle_opts=opts.ItemStyleOpts(border_color="#fff", border_width=1),
     ).set_global_opts(title_opts=opts.TitleOpts(title="建筑结构-单价", subtitle=""))
 )
-funnel.render("建筑结构&单价.html")
+funnel.render("./hjy_pic/建筑结构&单价.html")
 """
 建筑类型 & 单价
 """
@@ -124,7 +180,7 @@ c_d1 = (
         title_opts={"text": "建筑类别与单价的关系", "subtext": ""}
     )
 )
-c_d1.render("建筑类别&单价.html")
+c_d1.render("./hjy_pic/建筑类别&单价.html")
 
 
 # 基础数据
@@ -148,9 +204,9 @@ def change(x):
 """
 df["房屋所属市辖区"] = df["房屋所属市辖区"].map(change)
 area_dict = Counter(df["房屋所属市辖区"])
+print(area_dict)
 c = (
-    Map({"theme": theme})
-        .add("成都", [list(z) for z in zip(area_dict.keys(), area_dict.values())], "成都")
+    Map({"theme": theme}).add("成都", [list(z) for z in zip(area_dict.keys(), area_dict.values())], "成都")
         .set_global_opts(
         title_opts=opts.TitleOpts(title="成都地图"),
         visualmap_opts=opts.VisualMapOpts(
@@ -158,5 +214,5 @@ c = (
             max_=max(area_dict.values()),
             is_calculable=True,
         )
-    ).render("成都地图.html")
+    ).render("./hjy_pic/成都地图.html")
 )
