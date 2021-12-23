@@ -18,13 +18,13 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
 theme = ThemeType.ESSOS
 """
-探究装修和单价的关系 ：南丁格尔
+探究装修情况和单价的关系 ：南丁格尔
 """
-rank = []
-my_order = df.groupby(by=["装修情况"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
-rank = [[k, v] for k, v in my_order.items()]
+decorating_class = []
+decoration = df.groupby(by=["装修情况"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
+decorating_class = [[k, v] for k, v in decoration.items()]
 pie1 = Pie({"theme": theme}).add("装修情况和总价的关系",  # 添加提示框标签
-                                 rank,  # 输入数据
+                                 decorating_class,  # 输入数据
                                  radius=["20%", "70%"],  # 设置内半径和外半径
                                  center=["50%", "50%"],  # 设置圆心位置
                                  rosetype="radius")  # 玫瑰图模式，通过半径区分数值大小，角度大小表示占比
@@ -39,14 +39,14 @@ pie1.set_series_opts(label_opts=opts.LabelOpts(formatter="{b} : {d}%"))  # 设�
 pie1.render("装修&单价.html")
 
 """
-探究楼层和单价的关系 ： 饼图
+探究所在楼层和单价的关系 ： 饼图
 """
 df["所在楼层"] = df["所在楼层"].map(lambda x: x[0:3])
-rank = []
-my_order = df.groupby(by=["所在楼层"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
-rank = [[k, v] for k, v in my_order.items()]
+decorating_class = []
+decoration = df.groupby(by=["所在楼层"])["单价（元/平方米）"].median().sort_values(ascending=False).to_dict()
+decorating_class = [[k, v] for k, v in decoration.items()]
 pie1 = Pie({"theme": theme}).add("所在楼层和单价的关系",  # 添加提示框标签
-                                 rank,  # 输入数据
+                                 decorating_class,  # 输入数据
                                  radius=["0%", "70%"],  # 设置内半径和外半径
                                  center=["50%", "50%"],  # 设置圆心位置
                                  rosetype="radius")  # 玫瑰图模式，通过半径区分数值大小，角度大小表示占比
@@ -76,7 +76,7 @@ pie = (
 pie.render("电梯&单价.html")
 
 """
-住宅类别 & 单价
+房屋用途 & 单价
 """
 home_category = df.groupby(by=["房屋用途"])["单价（元/平方米）"].median().sort_values(ascending=False)
 home_categoryX = home_category.index.to_list()
@@ -111,7 +111,7 @@ funnel = (
 )
 funnel.render("建筑结构&单价.html")
 """
-建筑类别 & 单价
+建筑类型 & 单价
 """
 building_type = df.groupby(by=["建筑类型"])["单价（元/平方米）"].median().sort_values(ascending=False)
 building_typeX = building_type.index.to_list()
@@ -124,7 +124,7 @@ c_d1 = (
         title_opts={"text": "建筑类别与单价的关系", "subtext": ""}
     )
 )
-c_d1.render("住宅类别&单价.html")
+c_d1.render("建筑类别&单价.html")
 
 
 # 基础数据
