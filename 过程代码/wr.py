@@ -207,22 +207,22 @@ la = Lasso(alpha=0.1, fit_intercept=True, normalize=True,
 la.fit(x_train, y_train)
 la_y_predict = la.predict(x_test)
 #
-print(f'训练集得分：{round(la.score(x_train, y_train), 2)}')
-print(f'测试集得分：{round(la.score(x_test, y_test), 2)}')
-print("使用的特性数量:{}".format(np.sum(la.coef_ != 0)))
-print("正则项系数:0.01")
-la1 = Lasso(alpha=50, fit_intercept=True, normalize=True,
-            precompute=False, copy_X=True, max_iter=1000, tol=1e-4,
-            warm_start=False, positive=False, random_state=None,
-            selection='cyclic')
-la1.fit(x_train, y_train)
-print(f'训练集得分：{round(la1.score(x_train, y_train), 2)}')
-print(f'测试集得分：{round(la1.score(x_test, y_test), 2)}')
-print("使用的特性数量:{}".format(np.sum(la1.coef_ != 0)))
-
-# 结果评估
-# print('Lasso线性回归的均方误差为 :', np.sqrt(mean_squared_error(y_test, la_y_predict)))  # 计算均方差根判断效果
-print('Lasso线性回归的平均绝对误差为:', r2_score(y_test, la_y_predict))  # 计算均方误差回归损失，越接近于1拟合效果越好
+# print(f'训练集得分：{round(la.score(x_train, y_train), 2)}')
+# print(f'测试集得分：{round(la.score(x_test, y_test), 2)}')
+# print("使用的特性数量:{}".format(np.sum(la.coef_ != 0)))
+# print("正则项系数:0.01")
+# la1 = Lasso(alpha=50, fit_intercept=True, normalize=True,
+#             precompute=False, copy_X=True, max_iter=1000, tol=1e-4,
+#             warm_start=False, positive=False, random_state=None,
+#             selection='cyclic')
+# la1.fit(x_train, y_train)
+# print(f'训练集得分：{round(la1.score(x_train, y_train), 2)}')
+# print(f'测试集得分：{round(la1.score(x_test, y_test), 2)}')
+# print("使用的特性数量:{}".format(np.sum(la1.coef_ != 0)))
+#
+# # 结果评估
+# # print('Lasso线性回归的均方误差为 :', np.sqrt(mean_squared_error(y_test, la_y_predict)))  # 计算均方差根判断效果
+# print('Lasso线性回归的平均绝对误差为:', r2_score(y_test, la_y_predict))  # 计算均方误差回归损失，越接近于1拟合效果越好
 #
 #
 #
@@ -249,31 +249,31 @@ rf = RandomForestRegressor(n_estimators=20, max_features=0.4, max_depth=15)
 rf.fit(x_train, y_train)
 dtr_y_predict = rf.predict(x_test)
 # 模型的评估
-print(f'训练集得分：{round(rf.score(x_train, y_train), 2)}')
-print(f'测试集得分：{round(rf.score(x_test, y_test), 2)}')
-# print('随机森林的均方误差为 :', np.sqrt(mean_squared_error(y_test, dtr_y_predict)))  # 计算均方差根判断效果
-print('随机森林的平均绝对误差为:', r2_score(y_test, dtr_y_predict))  # 计算均方误差回归损失，越接近于1拟合效果越好
-print('解释方差回归得分：\n',explained_variance_score(y_test, dtr_y_predict)) #解释方差回归得分
-print('最大剩余误差：\n',max_error(y_test, dtr_y_predict))  # 最大剩余误差
-print('平均绝对误差回归损失：\n',mean_absolute_error(y_test, dtr_y_predict)) #平均绝对误差回归损失
-print('均方误差回归损失：\n',mean_squared_error(y_test, dtr_y_predict)) #均方误差回归损失
-print('均方对数误差回归损失：\n',mean_squared_log_error(y_test, dtr_y_predict))#均方对数误差回归损失
-print('中位绝对误差回归损失：\n',median_absolute_error(y_test, dtr_y_predict) ) #中位绝对误差回归损失
+# print(f'训练集得分：{round(rf.score(x_train, y_train), 2)}')
+# print(f'测试集得分：{round(rf.score(x_test, y_test), 2)}')
+# # print('随机森林的均方误差为 :', np.sqrt(mean_squared_error(y_test, dtr_y_predict)))  # 计算均方差根判断效果
+# print('随机森林的平均绝对误差为:', r2_score(y_test, dtr_y_predict))  # 计算均方误差回归损失，越接近于1拟合效果越好
+# print('解释方差回归得分：\n',explained_variance_score(y_test, dtr_y_predict)) #解释方差回归得分
+# print('最大剩余误差：\n',max_error(y_test, dtr_y_predict))  # 最大剩余误差
+# print('平均绝对误差回归损失：\n',mean_absolute_error(y_test, dtr_y_predict)) #平均绝对误差回归损失
+# print('均方误差回归损失：\n',mean_squared_error(y_test, dtr_y_predict)) #均方误差回归损失
+# print('均方对数误差回归损失：\n',mean_squared_log_error(y_test, dtr_y_predict))#均方对数误差回归损失
+# print('中位绝对误差回归损失：\n',median_absolute_error(y_test, dtr_y_predict) ) #中位绝对误差回归损失
+# #
+# # 绘制训练集和测试集相似度曲线
+# import numpy as np
+# import matplotlib.pyplot as plt
 #
-# 绘制训练集和测试集相似度曲线
-import numpy as np
-import matplotlib.pyplot as plt
-
-# 绘图展示预测效果
-dtr_y_predict.tolist().sort()
-y_test.tolist().sort()
-print(len(dtr_y_predict.tolist()))
-print(len(y_test.tolist()))
-x = np.arange(1, 3711)
-Pplot = plt.scatter(x, dtr_y_predict)
-Tplot = plt.scatter(x, y_test)
-plt.legend(handles=[Pplot, Tplot], labels=['y_pred', 'y_test'])
-plt.show()
+# # 绘图展示预测效果
+# dtr_y_predict.tolist().sort()
+# y_test.tolist().sort()
+# print(len(dtr_y_predict.tolist()))
+# print(len(y_test.tolist()))
+# x = np.arange(1, 3711)
+# Pplot = plt.scatter(x, dtr_y_predict)
+# Tplot = plt.scatter(x, y_test)
+# plt.legend(handles=[Pplot, Tplot], labels=['y_pred', 'y_test'])
+# plt.show()
 
 
 
